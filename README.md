@@ -112,7 +112,7 @@ caves-of-skramis/
 │   └── index.ts                  # Main application entry
 ├── dist/                         # Built files (generated)
 ├── node_modules/                 # Dependencies (generated)
-├── .eslintrc.json               # ESLint configuration
+├── eslint.config.mjs            # ESLint configuration
 ├── .prettierrc.json             # Prettier configuration
 ├── .gitignore                   # Git ignore rules
 ├── package.json                 # Project metadata and scripts
