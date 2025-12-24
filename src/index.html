@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description" content="Caves of Skramis - A fantasy roguelite dungeon crawler">
+    <title>Caves of Skramis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            overflow: hidden;
+            touch-action: none;
+        }
+        
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 10px;
+        }
+        
+        #game-canvas {
+            border: 2px solid #4a4a4a;
+            background-color: #0a0a0a;
+            max-width: 100%;
+            max-height: 80vh;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+        
+        #ui-panel {
+            width: 100%;
+            max-width: 800px;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #2a2a2a;
+            border: 2px solid #4a4a4a;
+            border-radius: 5px;
+        }
+        
+        .stat-bar {
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            background-color: #1a1a1a;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        
+        #message-log {
+            background-color: #1a1a1a;
+            padding: 10px;
+            border-radius: 3px;
+            height: 100px;
+            overflow-y: auto;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        
+        .message {
+            margin-bottom: 5px;
+        }
+        
+        .message-combat {
+            color: #ff6b6b;
+        }
+        
+        .message-info {
+            color: #4dabf7;
+        }
+        
+        .message-success {
+            color: #51cf66;
+        }
+        
+        #controls-info {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #1a1a1a;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: #4a4a4a;
+            color: #e0e0e0;
+            border: 1px solid #6a6a6a;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background-color: #5a5a5a;
+        }
+        
+        button:active {
+            background-color: #3a3a3a;
+        }
+        
+        @media (max-width: 600px) {
+            #game-container {
+                padding: 5px;
+            }
+            
+            #ui-panel {
+                padding: 10px;
+            }
+            
+            .stat-label, button {
+                font-size: 12px;
+            }
+            
+            #message-log {
+                height: 80px;
+                font-size: 11px;
+            }
+            
+            button {
+                padding: 8px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+        <div id="ui-panel">
+            <div class="stat-bar">
+                <div class="stat-label">Health:</div>
+                <div class="stat-value" id="health-display">100 / 100</div>
+            </div>
+            <div class="stat-bar">
+                <div class="stat-label">Level:</div>
+                <div class="stat-value" id="level-display">1</div>
+            </div>
+            <div class="stat-bar">
+                <div class="stat-label">Floor:</div>
+                <div class="stat-value" id="floor-display">1</div>
+            </div>
+            <div class="stat-bar">
+                <div class="stat-label">Messages:</div>
+                <div id="message-log"></div>
+            </div>
+            <div class="button-group">
+                <button id="new-game-btn">New Game</button>
+                <button id="save-code-btn">Get Save Code</button>
+                <button id="load-code-btn">Load Save Code</button>
+            </div>
+            <div id="controls-info">
+                <strong>Controls:</strong> Arrow Keys or WASD to move | Space to wait | Touch/Click to move on mobile
+            </div>
+        </div>
+    </div>
+</body>
+</html>
