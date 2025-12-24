@@ -9,6 +9,8 @@ export function encodeGameState(state: GameState): string {
     e: state.player.stats.experience,
     f: state.currentFloor,
     s: state.seed,
+    // Timestamp is stored so save metadata (e.g. playtime tracking, leaderboards, or future time-based validation)
+    // can be derived from the decoded game state, even though it is not part of checksum or game logic here.
     t: state.timestamp,
   };
 
