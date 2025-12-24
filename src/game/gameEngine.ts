@@ -290,6 +290,8 @@ export class GameEngine {
       this.state.player.stats.level++;
       this.state.player.stats.experience -= expNeeded;
       this.state.player.stats.maxHealth += 20;
+      // Design choice: on level up, the player is fully healed to the new maxHealth.
+      // If desired, this behavior can be made configurable instead of always fully restoring health.
       this.state.player.stats.health = this.state.player.stats.maxHealth;
       this.state.player.stats.attack += 2;
       this.state.player.stats.defense += 1;
