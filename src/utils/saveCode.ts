@@ -66,13 +66,18 @@ export function decodeSaveCode(code: string): Partial<GameState> | null {
 
 /**
  * Simple checksum for validation
+ *
+ * Uses a 32-bit hash to provide a much larger space of possible values
+ * than the previous modulo-based approach.
  */
 function simpleChecksum(str: string): string {
-  let sum = 0;
+  // FNV-1a style 32-bit hash
+  let hash = 0x811c9dc5; // 2166136261
   for (let i = 0; i < str.length; i++) {
-    sum += str.charCodeAt(i) * (i + 1);
+    hash ^= str.charCodeAt(i);
+    hash = (hash * 0x01000193) >>> 0; // 16777619, keep as unsigned 32-bit
   }
-  return (sum % 10000).toString(36);
+  return (hash >>> 0).toString(36);
 }
 
 /**
