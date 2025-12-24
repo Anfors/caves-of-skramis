@@ -207,25 +207,136 @@ export class GameEngine {
     ) as Enemy[];
 
     for (const enemy of enemies) {
-      // Simple AI: move towards player if within range
+      // Pathfinding AI: move towards player if within range using shortest path
       const distance = this.getDistance(enemy.position, this.state.player.position);
-      
-      if (distance < 8) {
-        const dx = Math.sign(this.state.player.position.x - enemy.position.x);
-        const dy = Math.sign(this.state.player.position.y - enemy.position.y);
 
-        // Try to move towards player
-        if (Math.abs(dx) > Math.abs(dy)) {
-          if (!this.moveEnemy(enemy, dx, 0)) {
-            this.moveEnemy(enemy, 0, dy);
-          }
-        } else {
-          if (!this.moveEnemy(enemy, 0, dy)) {
-            this.moveEnemy(enemy, dx, 0);
-          }
+      if (distance < 8) {
+        const nextStep = this.findNextStepTowards(
+          enemy.position,
+          this.state.player.position
+        );
+
+        if (nextStep) {
+          const { dx, dy } = nextStep;
+          this.moveEnemy(enemy, dx, dy);
         }
       }
     }
+  }
+
+  /**
+   * Find the next step towards a target using BFS pathfinding.
+   * Returns the delta (dx, dy) for the first step, or null if no path exists.
+   */
+  private findNextStepTowards(
+    start: Position,
+    target: Position
+  ): { dx: number; dy: number } | null {
+    if (!this.dungeon) return null;
+
+    // Early exit if already at target
+    if (start.x === target.x && start.y === target.y) {
+      return null;
+    }
+
+    const width = this.dungeon.width;
+    const height = this.dungeon.height;
+
+    const visited: boolean[][] = [];
+    const prev: (Position | null)[][] = [];
+    for (let y = 0; y < height; y++) {
+      visited[y] = [];
+      prev[y] = [];
+      for (let x = 0; x < width; x++) {
+        visited[y][x] = false;
+        prev[y][x] = null;
+      }
+    }
+
+    const queue: Position[] = [];
+    queue.push({ x: start.x, y: start.y });
+    visited[start.y][start.x] = true;
+
+    const directions: Position[] = [
+      { x: 1, y: 0 },
+      { x: -1, y: 0 },
+      { x: 0, y: 1 },
+      { x: 0, y: -1 },
+    ];
+
+    const isWalkable = (x: number, y: number): boolean => {
+      if (
+        x < 0 ||
+        x >= width ||
+        y < 0 ||
+        y >= height ||
+        this.dungeon!.tiles[y][x] === TileType.WALL
+      ) {
+        return false;
+      }
+
+      // Allow stepping onto the target even if something else is there
+      if (x === target.x && y === target.y) {
+        return true;
+      }
+
+      // Avoid tiles occupied by other enemies
+      const occupiedByEnemy = this.getEntityAt(
+        { x, y },
+        EntityType.ENEMY
+      );
+      return !occupiedByEnemy;
+    };
+
+    // BFS to find shortest path
+    while (queue.length > 0) {
+      const current = queue.shift() as Position;
+
+      if (current.x === target.x && current.y === target.y) {
+        break;
+      }
+
+      for (const dir of directions) {
+        const nx = current.x + dir.x;
+        const ny = current.y + dir.y;
+
+        if (!isWalkable(nx, ny)) continue;
+        if (visited[ny][nx]) continue;
+
+        visited[ny][nx] = true;
+        prev[ny][nx] = { x: current.x, y: current.y };
+        queue.push({ x: nx, y: ny });
+      }
+    }
+
+    // No path if target was never visited
+    if (!visited[target.y] || !visited[target.y][target.x]) {
+      return null;
+    }
+
+    // Reconstruct path from target back to start
+   let step: Position = { x: target.x, y: target.y };
+    let previous: Position | null = prev[step.y][step.x];
+
+    // Walk backwards until we reach the tile adjacent to start
+    while (previous && !(previous.x === start.x && previous.y === start.y)) {
+      step = previous;
+      previous = prev[step.y][step.x];
+    }
+
+    // If there is no valid previous step, no movement
+    if (!previous) {
+      return null;
+    }
+
+    const dx = step.x - start.x;
+    const dy = step.y - start.y;
+
+    // Normalize dx, dy to -1, 0, or 1
+    const normDx = dx === 0 ? 0 : dx / Math.abs(dx);
+    const normDy = dy === 0 ? 0 : dy / Math.abs(dy);
+
+    return { dx: normDx, dy: normDy };
   }
 
   /**
