@@ -232,8 +232,8 @@ class Game {
   /**
    * Load save code
    */
-  private loadSaveCode(): void {
-    const code = this.uiController.promptForSaveCode();
+  private async loadSaveCode(): Promise<void> {
+    const code = await this.uiController.promptForSaveCode();
     if (!code) {
       return;
     }
