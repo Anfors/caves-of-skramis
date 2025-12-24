@@ -12,10 +12,28 @@ export class UIController {
   private maxMessages = 10;
 
   constructor() {
-    this.healthDisplay = document.getElementById('health-display')!;
-    this.levelDisplay = document.getElementById('level-display')!;
-    this.floorDisplay = document.getElementById('floor-display')!;
-    this.messageLog = document.getElementById('message-log')!;
+    const healthDisplay = document.getElementById('health-display');
+    const levelDisplay = document.getElementById('level-display');
+    const floorDisplay = document.getElementById('floor-display');
+    const messageLog = document.getElementById('message-log');
+
+    if (!healthDisplay) {
+      throw new Error("Required UI element with id 'health-display' was not found in the DOM.");
+    }
+    if (!levelDisplay) {
+      throw new Error("Required UI element with id 'level-display' was not found in the DOM.");
+    }
+    if (!floorDisplay) {
+      throw new Error("Required UI element with id 'floor-display' was not found in the DOM.");
+    }
+    if (!messageLog) {
+      throw new Error("Required UI element with id 'message-log' was not found in the DOM.");
+    }
+
+    this.healthDisplay = healthDisplay;
+    this.levelDisplay = levelDisplay;
+    this.floorDisplay = floorDisplay;
+    this.messageLog = messageLog;
   }
 
   /**
