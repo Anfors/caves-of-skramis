@@ -29,6 +29,9 @@ export const MOBILE_TILE_SIZE = 32;
 
 /**
  * Check if the device is mobile
+ * Uses hybrid approach: user agent + window width for better coverage
+ * - User agent catches mobile browsers that may have large viewports
+ * - Window width catches responsive layouts and tablets
  */
 export function isMobileDevice(): boolean {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(

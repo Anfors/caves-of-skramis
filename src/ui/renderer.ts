@@ -8,7 +8,8 @@ import { getViewportWidth, getViewportHeight, getTileSize } from '../config';
 export class Renderer {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
-  private tileSize: number = getTileSize();
+  private baseTileSize: number; // Base tile size before zoom
+  private tileSize: number;
   private viewportWidth: number = getViewportWidth();
   private viewportHeight: number = getViewportHeight();
   private zoomLevel = 1.0; // Default zoom level
@@ -20,6 +21,8 @@ export class Renderer {
       throw new Error('Could not get canvas context');
     }
     this.ctx = ctx;
+    this.baseTileSize = getTileSize(); // Cache base tile size
+    this.tileSize = this.baseTileSize;
     this.updateViewportSettings();
     this.resizeCanvas();
   }
@@ -30,7 +33,7 @@ export class Renderer {
   private updateViewportSettings(): void {
     this.viewportWidth = getViewportWidth();
     this.viewportHeight = getViewportHeight();
-    this.tileSize = Math.round(getTileSize() * this.zoomLevel);
+    this.tileSize = Math.round(this.baseTileSize * this.zoomLevel);
   }
 
   /**
