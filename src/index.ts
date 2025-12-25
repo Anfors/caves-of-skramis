@@ -55,6 +55,25 @@ class Game {
     saveCodeBtn?.addEventListener('click', () => this.showSaveCode());
     loadCodeBtn?.addEventListener('click', () => this.loadSaveCode());
 
+    // Menu controls
+    const menuButton = document.getElementById('menu-button');
+    const menuOverlay = document.getElementById('menu-overlay');
+    const menuCloseBtn = document.getElementById('menu-close-btn');
+
+    menuButton?.addEventListener('click', () => {
+      menuOverlay?.classList.add('active');
+    });
+
+    menuCloseBtn?.addEventListener('click', () => {
+      menuOverlay?.classList.remove('active');
+    });
+
+    menuOverlay?.addEventListener('click', (e) => {
+      if (e.target === menuOverlay) {
+        menuOverlay.classList.remove('active');
+      }
+    });
+
     // Zoom slider control
     const zoomSlider = document.getElementById('zoom-slider') as HTMLInputElement;
     const zoomValue = document.getElementById('zoom-value');
