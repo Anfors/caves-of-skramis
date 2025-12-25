@@ -2,7 +2,7 @@ import { GameEngine } from './game/gameEngine';
 import { Renderer } from './ui/renderer';
 import { UIController } from './ui/uiController';
 import { encodeGameState, decodeSaveCode } from './utils/saveCode';
-import { VIEWPORT_WIDTH, VIEWPORT_HEIGHT } from './config';
+import { getViewportWidth, getViewportHeight } from './config';
 
 /**
  * Main game application
@@ -54,6 +54,18 @@ class Game {
     newGameBtn?.addEventListener('click', () => this.newGame());
     saveCodeBtn?.addEventListener('click', () => this.showSaveCode());
     loadCodeBtn?.addEventListener('click', () => this.loadSaveCode());
+
+    // Zoom slider control
+    const zoomSlider = document.getElementById('zoom-slider') as HTMLInputElement;
+    const zoomValue = document.getElementById('zoom-value');
+    
+    if (zoomSlider && zoomValue) {
+      zoomSlider.addEventListener('input', () => {
+        const zoom = parseInt(zoomSlider.value) / 100;
+        this.renderer.setZoomLevel(zoom);
+        zoomValue.textContent = `${zoomSlider.value}%`;
+      });
+    }
   }
 
   /**
@@ -143,8 +155,8 @@ class Game {
     }
 
     // Calculate camera position
-    const viewportWidth = VIEWPORT_WIDTH;
-    const viewportHeight = VIEWPORT_HEIGHT;
+    const viewportWidth = getViewportWidth();
+    const viewportHeight = getViewportHeight();
     const cameraX = Math.max(
       0,
       Math.min(

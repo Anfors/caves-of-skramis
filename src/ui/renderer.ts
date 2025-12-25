@@ -1,6 +1,6 @@
 import { TileType, EntityType, Position } from '../game/types';
 import { GameEngine } from '../game/gameEngine';
-import { VIEWPORT_WIDTH, VIEWPORT_HEIGHT } from '../config';
+import { getViewportWidth, getViewportHeight, getTileSize } from '../config';
 
 /**
  * Renderer for the game
@@ -8,9 +8,10 @@ import { VIEWPORT_WIDTH, VIEWPORT_HEIGHT } from '../config';
 export class Renderer {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
-  private tileSize = 16;
-  private viewportWidth = VIEWPORT_WIDTH;
-  private viewportHeight = VIEWPORT_HEIGHT;
+  private tileSize: number = getTileSize();
+  private viewportWidth: number = getViewportWidth();
+  private viewportHeight: number = getViewportHeight();
+  private zoomLevel = 1.0; // Default zoom level
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -19,7 +20,33 @@ export class Renderer {
       throw new Error('Could not get canvas context');
     }
     this.ctx = ctx;
+    this.updateViewportSettings();
     this.resizeCanvas();
+  }
+
+  /**
+   * Update viewport settings based on device and zoom level
+   */
+  private updateViewportSettings(): void {
+    this.viewportWidth = getViewportWidth();
+    this.viewportHeight = getViewportHeight();
+    this.tileSize = Math.round(getTileSize() * this.zoomLevel);
+  }
+
+  /**
+   * Set zoom level (0.5 to 2.0)
+   */
+  setZoomLevel(zoom: number): void {
+    this.zoomLevel = Math.max(0.5, Math.min(2.0, zoom));
+    this.updateViewportSettings();
+    this.resizeCanvas();
+  }
+
+  /**
+   * Get current zoom level
+   */
+  getZoomLevel(): number {
+    return this.zoomLevel;
   }
 
   /**
