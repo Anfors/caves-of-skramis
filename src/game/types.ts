@@ -53,7 +53,7 @@ export interface Stats {
 export interface ActiveEffect {
   id: string;
   name: string;
-  type: 'damage_multiplier';
+  type: 'damage_multiplier'; // Could be extended with other effect types in the future
   value: number;
   remainingDuration: number;
 }
