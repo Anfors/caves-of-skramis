@@ -186,8 +186,14 @@ export class DungeonGenerator {
 
     // Place items (pick-ups) in some rooms
     const itemCount = Math.min(2 + Math.floor(floor / 2), rooms.length - 2);
-    for (let i = 0; i < itemCount && i < rooms.length - 1; i++) {
-      // Find a room that doesn't have an item yet
+    let itemsPlaced = 0;
+    let attempts = 0;
+    const maxAttempts = itemCount * 10; // Try multiple times to place each item
+    
+    while (itemsPlaced < itemCount && attempts < maxAttempts && rooms.length > 1) {
+      attempts++;
+      
+      // Find a random room (skip first room for player spawn)
       const roomIndex = this.random.nextInt(1, rooms.length - 1);
       const room = rooms[roomIndex];
       const position = this.getRandomPositionInRoom(room);
@@ -200,7 +206,7 @@ export class DungeonGenerator {
       const pickup = this.random.choose(PICKUPS);
       
       const item: Item = {
-        id: `item-${i}`,
+        id: `item-${itemsPlaced}`,
         type: EntityType.ITEM,
         position,
         sprite: pickup.sprite,
@@ -209,6 +215,7 @@ export class DungeonGenerator {
       };
       
       entities.push(item);
+      itemsPlaced++;
     }
 
     return entities;
