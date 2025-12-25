@@ -2,6 +2,7 @@ import { GameEngine } from './game/gameEngine';
 import { Renderer } from './ui/renderer';
 import { UIController } from './ui/uiController';
 import { encodeGameState, decodeSaveCode } from './utils/saveCode';
+import { VIEWPORT_WIDTH, VIEWPORT_HEIGHT } from './config';
 
 /**
  * Main game application
@@ -142,8 +143,8 @@ class Game {
     }
 
     // Calculate camera position
-    const viewportWidth = 40;
-    const viewportHeight = 30;
+    const viewportWidth = VIEWPORT_WIDTH;
+    const viewportHeight = VIEWPORT_HEIGHT;
     const cameraX = Math.max(
       0,
       Math.min(

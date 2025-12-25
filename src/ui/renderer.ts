@@ -1,5 +1,6 @@
 import { TileType, EntityType, Position } from '../game/types';
 import { GameEngine } from '../game/gameEngine';
+import { VIEWPORT_WIDTH, VIEWPORT_HEIGHT } from '../config';
 
 /**
  * Renderer for the game
@@ -8,8 +9,8 @@ export class Renderer {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private tileSize = 16;
-  private viewportWidth = 40;
-  private viewportHeight = 30;
+  private viewportWidth = VIEWPORT_WIDTH;
+  private viewportHeight = VIEWPORT_HEIGHT;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
