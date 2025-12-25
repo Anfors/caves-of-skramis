@@ -7,9 +7,12 @@ import {
   TileType,
   Enemy,
   Entity,
+  Item,
+  ActiveEffect,
 } from './types';
 import { DungeonGenerator } from './dungeonGenerator';
 import { generateSeed } from '../utils/random';
+import { PICKUPS } from '../config';
 
 /**
  * Game action result
@@ -66,6 +69,7 @@ export class GameEngine {
         level: 1,
         experience: 0,
       },
+      activeEffects: [],
     };
 
     return {
@@ -139,6 +143,17 @@ export class GameEngine {
       return { success: true, message: `Descended to floor ${this.state.currentFloor}!` };
     }
 
+    // Check for items
+    const item = this.getEntityAt(newPos, EntityType.ITEM) as Item;
+    if (item) {
+      const pickupResult = this.pickupItem(item);
+      // Move player after picking up item
+      this.state.player.position = newPos;
+      // Enemy turn
+      this.enemyTurn();
+      return { success: true, message: pickupResult };
+    }
+
     // Move player
     this.state.player.position = newPos;
     
@@ -152,13 +167,23 @@ export class GameEngine {
    * Attack an enemy
    */
   private attack(enemy: Enemy): GameAction {
-    const playerAttack = this.state.player.stats.attack;
+    // Get base player attack
+    let playerAttack = this.state.player.stats.attack;
+    
+    // Apply damage multiplier if active
+    const damageMultiplier = this.getActiveDamageMultiplier();
+    playerAttack = Math.floor(playerAttack * damageMultiplier);
+    
     const enemyDefense = enemy.stats.defense;
     const damage = Math.max(1, playerAttack - enemyDefense);
 
     enemy.stats.health -= damage;
 
     let message = `You hit the ${enemy.enemyType} for ${damage} damage!`;
+    if (damageMultiplier > 1) {
+      message += ` (${damageMultiplier}x damage!)`;
+    }
+    
     let killed = false;
 
     if (enemy.stats.health <= 0) {
@@ -174,6 +199,9 @@ export class GameEngine {
         message += ` ${levelUpMessage}`;
       }
     }
+
+    // Consume damage multiplier effects after combat
+    this.consumeEffects();
 
     // Enemy counterattack if still alive
     let enemyDamage = 0;
@@ -409,6 +437,90 @@ export class GameEngine {
       return `Level up! You are now level ${this.state.player.stats.level}!`;
     }
     return null;
+  }
+
+  /**
+   * Pick up an item and apply its effects
+   */
+  private pickupItem(item: Item): string {
+    // Find the pickup config
+    const pickupConfig = PICKUPS.find(p => p.id === item.itemId);
+    if (!pickupConfig) {
+      return 'Unknown item';
+    }
+
+    // Remove item from dungeon
+    this.removeEntity(item.id);
+
+    let message = `You picked up ${pickupConfig.name}! `;
+
+    // Apply effect based on type
+    if (pickupConfig.effect.type === 'health') {
+      const healAmount = Math.floor(this.state.player.stats.maxHealth * pickupConfig.effect.value);
+      const actualHeal = Math.min(
+        healAmount,
+        this.state.player.stats.maxHealth - this.state.player.stats.health
+      );
+      this.state.player.stats.health += actualHeal;
+      message += `Healed ${actualHeal} HP!`;
+    } else if (pickupConfig.effect.type === 'damage_multiplier') {
+      // Add active effect
+      if (!this.state.player.activeEffects) {
+        this.state.player.activeEffects = [];
+      }
+      
+      const effect: ActiveEffect = {
+        id: pickupConfig.id,
+        name: pickupConfig.name,
+        type: 'damage_multiplier',
+        value: pickupConfig.effect.value,
+        remainingDuration: pickupConfig.effect.duration || 1,
+      };
+      
+      this.state.player.activeEffects.push(effect);
+      message += `Damage increased ${pickupConfig.effect.value}x for the next ${effect.remainingDuration} encounter(s)!`;
+    }
+
+    return message;
+  }
+
+  /**
+   * Get the current damage multiplier from active effects
+   */
+  private getActiveDamageMultiplier(): number {
+    if (!this.state.player.activeEffects || this.state.player.activeEffects.length === 0) {
+      return 1;
+    }
+
+    let multiplier = 1;
+    for (const effect of this.state.player.activeEffects) {
+      if (effect.type === 'damage_multiplier' && effect.remainingDuration > 0) {
+        multiplier *= effect.value;
+      }
+    }
+
+    return multiplier;
+  }
+
+  /**
+   * Consume active effects after combat
+   */
+  private consumeEffects(): void {
+    if (!this.state.player.activeEffects) {
+      return;
+    }
+
+    // Decrease duration for all effects
+    for (const effect of this.state.player.activeEffects) {
+      if (effect.remainingDuration > 0) {
+        effect.remainingDuration--;
+      }
+    }
+
+    // Remove expired effects
+    this.state.player.activeEffects = this.state.player.activeEffects.filter(
+      effect => effect.remainingDuration > 0
+    );
   }
 
   /**

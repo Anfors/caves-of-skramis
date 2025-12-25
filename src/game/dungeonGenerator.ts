@@ -1,5 +1,6 @@
-import { DungeonMap, TileType, Position, Entity, EntityType, Enemy } from './types';
+import { DungeonMap, TileType, Position, Entity, EntityType, Enemy, Item } from './types';
 import { SeededRandom } from '../utils/random';
+import { PICKUPS } from '../config';
 
 /**
  * Room in the dungeon
@@ -181,6 +182,41 @@ export class DungeonGenerator {
       };
       
       entities.push(enemy);
+    }
+
+    // Place items (pick-ups) in some rooms
+    // Item count scales with floor: 2 items on floor 1, 3 on floors 2-3, 4 on floors 4-5, etc.
+    const itemCount = Math.min(2 + Math.floor(floor / 2), rooms.length - 2);
+    let itemsPlaced = 0;
+    let attempts = 0;
+    const maxAttempts = itemCount * 10; // Try multiple times to place each item
+    
+    while (itemsPlaced < itemCount && attempts < maxAttempts && rooms.length > 1) {
+      attempts++;
+      
+      // Find a random room (skip first room for player spawn)
+      const roomIndex = this.random.nextInt(1, rooms.length - 1);
+      const room = rooms[roomIndex];
+      const position = this.getRandomPositionInRoom(room);
+      
+      // Check if position is already occupied
+      const occupied = entities.some(e => e.position.x === position.x && e.position.y === position.y);
+      if (occupied) continue;
+      
+      // Choose a random pickup from config
+      const pickup = this.random.choose(PICKUPS);
+      
+      const item: Item = {
+        id: `item-${itemsPlaced}`,
+        type: EntityType.ITEM,
+        position,
+        sprite: pickup.sprite,
+        itemId: pickup.id,
+        name: pickup.name,
+      };
+      
+      entities.push(item);
+      itemsPlaced++;
     }
 
     return entities;
