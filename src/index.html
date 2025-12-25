@@ -16,8 +16,8 @@
             font-family: 'Courier New', monospace;
             background-color: #1a1a1a;
             color: #e0e0e0;
-            overflow: hidden;
-            touch-action: none;
+            overflow: auto;
+            touch-action: pan-y pinch-zoom;
         }
         
         #game-container {
@@ -169,6 +169,92 @@
             text-align: right;
         }
         
+        /* Floating menu button */
+        #menu-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: #4dabf7;
+            color: #fff;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            z-index: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        
+        #menu-button:hover {
+            background-color: #339af0;
+            transform: scale(1.05);
+        }
+        
+        #menu-button:active {
+            background-color: #1c7ed6;
+            transform: scale(0.95);
+        }
+        
+        /* Menu overlay */
+        #menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 950;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #menu-overlay.active {
+            display: flex;
+        }
+        
+        /* Menu panel */
+        #menu-panel {
+            background-color: #2a2a2a;
+            border: 2px solid #4a4a4a;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 90%;
+            width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        #menu-panel h2 {
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            color: #4dabf7;
+        }
+        
+        .menu-section {
+            margin-bottom: 20px;
+        }
+        
+        .menu-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .menu-section h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #e0e0e0;
+        }
+        
+        #menu-close-btn {
+            width: 100%;
+            margin-top: 15px;
+        }
+        
         @media (max-width: 600px) {
             #game-container {
                 padding: 5px;
@@ -215,17 +301,39 @@
             </div>
             <div class="button-group">
                 <button id="new-game-btn">New Game</button>
-                <button id="save-code-btn">Get Save Code</button>
-                <button id="load-code-btn">Load Save Code</button>
-            </div>
-            <div class="zoom-control">
-                <label for="zoom-slider">Zoom Level:</label>
-                <input type="range" id="zoom-slider" min="50" max="200" value="100" step="10">
-                <span id="zoom-value">100%</span>
             </div>
             <div id="controls-info">
                 <strong>Controls:</strong> Arrow Keys or WASD to move | Space to wait | Touch/Click to move on mobile
             </div>
+        </div>
+    </div>
+    
+    <!-- Floating Menu Button -->
+    <button id="menu-button" aria-label="Open menu">⚙️</button>
+    
+    <!-- Menu Overlay -->
+    <div id="menu-overlay">
+        <div id="menu-panel">
+            <h2>Settings & Options</h2>
+            
+            <div class="menu-section">
+                <h3>Zoom Level</h3>
+                <div class="zoom-control">
+                    <label for="zoom-slider">Zoom:</label>
+                    <input type="range" id="zoom-slider" min="50" max="200" value="100" step="10">
+                    <span id="zoom-value">100%</span>
+                </div>
+            </div>
+            
+            <div class="menu-section">
+                <h3>Save & Load</h3>
+                <div class="button-group">
+                    <button id="save-code-btn">Get Save Code</button>
+                    <button id="load-code-btn">Load Save Code</button>
+                </div>
+            </div>
+            
+            <button id="menu-close-btn">Close Menu</button>
         </div>
     </div>
 </body>
