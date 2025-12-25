@@ -186,8 +186,12 @@ export class Renderer {
    */
   screenToWorld(screenX: number, screenY: number, cameraPos: Position): Position {
     const rect = this.canvas.getBoundingClientRect();
-    const canvasX = screenX - rect.left;
-    const canvasY = screenY - rect.top;
+    
+    // Scale coordinates to account for CSS scaling of the canvas
+    const scaleX = this.canvas.width / rect.width;
+    const scaleY = this.canvas.height / rect.height;
+    const canvasX = (screenX - rect.left) * scaleX;
+    const canvasY = (screenY - rect.top) * scaleY;
 
     const tileX = Math.floor(canvasX / this.tileSize);
     const tileY = Math.floor(canvasY / this.tileSize);
