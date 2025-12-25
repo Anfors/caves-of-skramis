@@ -123,6 +123,52 @@
             background-color: #3a3a3a;
         }
         
+        .zoom-control {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #1a1a1a;
+            border-radius: 3px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .zoom-control label {
+            font-weight: bold;
+        }
+        
+        #zoom-slider {
+            flex: 1;
+            height: 6px;
+            background: #4a4a4a;
+            border-radius: 3px;
+            outline: none;
+        }
+        
+        #zoom-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #4dabf7;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        
+        #zoom-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #4dabf7;
+            cursor: pointer;
+            border-radius: 50%;
+            border: none;
+        }
+        
+        #zoom-value {
+            min-width: 40px;
+            text-align: right;
+        }
+        
         @media (max-width: 600px) {
             #game-container {
                 padding: 5px;
@@ -171,6 +217,11 @@
                 <button id="new-game-btn">New Game</button>
                 <button id="save-code-btn">Get Save Code</button>
                 <button id="load-code-btn">Load Save Code</button>
+            </div>
+            <div class="zoom-control">
+                <label for="zoom-slider">Zoom Level:</label>
+                <input type="range" id="zoom-slider" min="50" max="200" value="100" step="10">
+                <span id="zoom-value">100%</span>
             </div>
             <div id="controls-info">
                 <strong>Controls:</strong> Arrow Keys or WASD to move | Space to wait | Touch/Click to move on mobile
