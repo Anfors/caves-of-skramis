@@ -48,11 +48,23 @@ export interface Stats {
 }
 
 /**
+ * Active effect on a player
+ */
+export interface ActiveEffect {
+  id: string;
+  name: string;
+  type: 'damage_multiplier';
+  value: number;
+  remainingDuration: number;
+}
+
+/**
  * Player entity
  */
 export interface Player extends Entity {
   type: EntityType.PLAYER;
   stats: Stats;
+  activeEffects?: ActiveEffect[];
 }
 
 /**
@@ -62,6 +74,15 @@ export interface Enemy extends Entity {
   type: EntityType.ENEMY;
   stats: Stats;
   enemyType: string;
+}
+
+/**
+ * Item entity (pick-ups)
+ */
+export interface Item extends Entity {
+  type: EntityType.ITEM;
+  itemId: string;
+  name: string;
 }
 
 /**

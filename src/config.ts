@@ -63,3 +63,48 @@ export function getTileSize(): number {
 // Legacy exports for backward compatibility (use dynamic functions above instead)
 export const VIEWPORT_WIDTH = DESKTOP_VIEWPORT_WIDTH;
 export const VIEWPORT_HEIGHT = DESKTOP_VIEWPORT_HEIGHT;
+
+/**
+ * Pick-up item configuration
+ */
+export interface PickupConfig {
+  id: string;
+  name: string;
+  sprite: string;
+  description: string;
+  effect: PickupEffect;
+}
+
+export interface PickupEffect {
+  type: 'health' | 'damage_multiplier';
+  value: number; // For health: percentage (0.5 = 50%), for damage_multiplier: multiplier (2 = 2x)
+  duration?: number; // Number of encounters (for power-ups), undefined for instant effects
+}
+
+/**
+ * Available pick-ups in the game
+ * Can be extended by adding new entries to this array
+ */
+export const PICKUPS: PickupConfig[] = [
+  {
+    id: 'health_potion',
+    name: 'Health Potion',
+    sprite: '!',
+    description: 'Heals 50% of max health',
+    effect: {
+      type: 'health',
+      value: 0.5,
+    },
+  },
+  {
+    id: 'damage_power_up',
+    name: 'Power Crystal',
+    sprite: '*',
+    description: 'Doubles damage for the next encounter',
+    effect: {
+      type: 'damage_multiplier',
+      value: 2,
+      duration: 1,
+    },
+  },
+];
