@@ -186,7 +186,9 @@ export class DungeonGenerator {
 
     // Place items (pick-ups) in some rooms
     // Item count scales with floor: 2 items on floor 1, 3 on floors 2-3, 4 on floors 4-5, etc.
-    const itemCount = Math.min(2 + Math.floor(floor / 2), rooms.length - 2);
+    // Limit to available rooms (exclude first room for player spawn)
+    const desiredItemCount = 2 + Math.floor(floor / 2);
+    const itemCount = Math.min(desiredItemCount, Math.max(0, rooms.length - 1));
     let itemsPlaced = 0;
     let attempts = 0;
     const maxAttempts = itemCount * 10; // Try multiple times to place each item
