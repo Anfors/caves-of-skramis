@@ -1,6 +1,6 @@
 import { DungeonMap, TileType, Position, Entity, EntityType, Enemy, Item } from './types';
 import { SeededRandom } from '../utils/random';
-import { PICKUPS } from '../config';
+import { PICKUPS, MONSTER_TYPES, MONSTER_STATS } from '../config';
 
 /**
  * Room in the dungeon
@@ -162,22 +162,21 @@ export class DungeonGenerator {
       const room = rooms[i + 1];
       const position = this.getRandomPositionInRoom(room);
       
-      const enemyTypes = ['goblin', 'orc', 'troll', 'skeleton', 'wraith'];
-      const enemyType = this.random.choose(enemyTypes);
+      const monsterType = this.random.choose(MONSTER_TYPES);
       
       const enemy: Enemy = {
         id: `enemy-${i}`,
         type: EntityType.ENEMY,
         position,
-        sprite: this.getEnemySprite(enemyType),
-        enemyType,
+        sprite: monsterType.sprite,
+        enemyType: monsterType.name,
         stats: {
-          maxHealth: 20 + floor * 10,
-          health: 20 + floor * 10,
-          attack: 3 + floor * 2,
-          defense: 1 + floor,
+          maxHealth: MONSTER_STATS.baseHealth + floor * MONSTER_STATS.healthPerFloor,
+          health: MONSTER_STATS.baseHealth + floor * MONSTER_STATS.healthPerFloor,
+          attack: MONSTER_STATS.baseAttack + floor * MONSTER_STATS.attackPerFloor,
+          defense: MONSTER_STATS.baseDefense + floor * MONSTER_STATS.defensePerFloor,
           level: floor,
-          experience: 0,
+          experience: MONSTER_STATS.experienceReward * floor,
         },
       };
       
@@ -229,16 +228,5 @@ export class DungeonGenerator {
       x: this.random.nextInt(room.x + 1, room.x + room.width - 2),
       y: this.random.nextInt(room.y + 1, room.y + room.height - 2),
     };
-  }
-
-  private getEnemySprite(enemyType: string): string {
-    const sprites: Record<string, string> = {
-      goblin: 'g',
-      orc: 'o',
-      troll: 'T',
-      skeleton: 's',
-      wraith: 'W',
-    };
-    return sprites[enemyType] || 'e';
   }
 }

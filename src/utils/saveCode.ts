@@ -1,4 +1,5 @@
 import { GameState, EntityType } from '../game/types';
+import { PLAYER_START, PLAYER_LEVEL_UP } from '../config';
 
 /**
  * Encode game state to a save code
@@ -47,14 +48,14 @@ export function decodeSaveCode(code: string): Partial<GameState> | null {
         id: 'player',
         type: EntityType.PLAYER,
         position: { x: 0, y: 0 },
-        sprite: '@',
+        sprite: PLAYER_START.sprite,
         stats: {
           level: data.l || 1,
           experience: data.e || 0,
-          maxHealth: 100 + (data.l - 1) * 20,
-          health: 100 + (data.l - 1) * 20,
-          attack: 5 + (data.l - 1) * 2,
-          defense: 2 + (data.l - 1),
+          maxHealth: PLAYER_START.maxHealth + (data.l - 1) * PLAYER_LEVEL_UP.healthIncrease,
+          health: PLAYER_START.maxHealth + (data.l - 1) * PLAYER_LEVEL_UP.healthIncrease,
+          attack: PLAYER_START.attack + (data.l - 1) * PLAYER_LEVEL_UP.attackIncrease,
+          defense: PLAYER_START.defense + (data.l - 1) * PLAYER_LEVEL_UP.defenseIncrease,
         },
       },
       currentFloor: data.f || 1,

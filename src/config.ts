@@ -108,3 +108,80 @@ export const PICKUPS: PickupConfig[] = [
     },
   },
 ];
+
+/**
+ * Player starting configuration
+ */
+export interface PlayerConfig {
+  sprite: string;
+  maxHealth: number;
+  attack: number;
+  defense: number;
+  level: number;
+  experience: number;
+}
+
+export const PLAYER_START: PlayerConfig = {
+  sprite: '@',
+  maxHealth: 100,
+  attack: 5,
+  defense: 2,
+  level: 1,
+  experience: 0,
+};
+
+/**
+ * Player level-up configuration
+ */
+export const PLAYER_LEVEL_UP = {
+  healthIncrease: 20,
+  attackIncrease: 2,
+  defenseIncrease: 1,
+  experiencePerLevel: 100, // Base XP needed, multiplied by level
+};
+
+/**
+ * Monster type configuration
+ */
+export interface MonsterTypeConfig {
+  name: string;
+  sprite: string;
+}
+
+/**
+ * Monster stats configuration
+ */
+export interface MonsterStatsConfig {
+  baseHealth: number;
+  healthPerFloor: number;
+  baseAttack: number;
+  attackPerFloor: number;
+  baseDefense: number;
+  defensePerFloor: number;
+  experienceReward: number; // Base XP, multiplied by level
+}
+
+/**
+ * Available monster types
+ * Can be extended by adding new entries to this array
+ */
+export const MONSTER_TYPES: MonsterTypeConfig[] = [
+  { name: 'goblin', sprite: 'g' },
+  { name: 'orc', sprite: 'o' },
+  { name: 'troll', sprite: 'T' },
+  { name: 'skeleton', sprite: 's' },
+  { name: 'wraith', sprite: 'W' },
+];
+
+/**
+ * Monster stats scaling configuration
+ */
+export const MONSTER_STATS: MonsterStatsConfig = {
+  baseHealth: 20,
+  healthPerFloor: 10,
+  baseAttack: 3,
+  attackPerFloor: 2,
+  baseDefense: 1,
+  defensePerFloor: 1,
+  experienceReward: 10,
+};
