@@ -133,7 +133,14 @@ export const PLAYER_START: PlayerConfig = {
 /**
  * Player level-up configuration
  */
-export const PLAYER_LEVEL_UP = {
+export interface PlayerLevelUpConfig {
+  healthIncrease: number;
+  attackIncrease: number;
+  defenseIncrease: number;
+  experiencePerLevel: number; // Base XP needed, multiplied by level
+}
+
+export const PLAYER_LEVEL_UP: PlayerLevelUpConfig = {
   healthIncrease: 20,
   attackIncrease: 2,
   defenseIncrease: 1,
