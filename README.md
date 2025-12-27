@@ -227,7 +227,6 @@ export const MONSTER_TYPES: MonsterTypeConfig[] = [
   },
   // Add your own monsters here!
 ];
-];
 ```
 
 ### Dungeon Size
