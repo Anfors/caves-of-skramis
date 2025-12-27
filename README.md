@@ -197,25 +197,36 @@ export const PLAYER_LEVEL_UP: PlayerLevelUpConfig = {
   experiencePerLevel: 100, // XP needed (multiplied by level)
 };
 
-// Monster stats scaling
-export const MONSTER_STATS: MonsterStatsConfig = {
-  baseHealth: 20,          // Starting health
-  healthPerFloor: 10,      // Health increase per floor
-  baseAttack: 3,           // Starting attack
-  attackPerFloor: 2,       // Attack increase per floor
-  baseDefense: 1,          // Starting defense
-  defensePerFloor: 1,      // Defense increase per floor
-  experienceReward: 10,    // XP reward (multiplied by floor)
-};
-
-// Add or modify monster types
+// Monster types with individual stats
 export const MONSTER_TYPES: MonsterTypeConfig[] = [
-  { name: 'goblin', sprite: 'g' },
-  { name: 'orc', sprite: 'o' },
-  { name: 'troll', sprite: 'T' },
-  { name: 'skeleton', sprite: 's' },
-  { name: 'wraith', sprite: 'W' },
+  {
+    name: 'goblin',
+    sprite: 'g',
+    stats: {
+      baseHealth: 15,        // Starting health
+      healthPerFloor: 8,     // Health increase per floor
+      baseAttack: 2,         // Starting attack
+      attackPerFloor: 1,     // Attack increase per floor
+      baseDefense: 0,        // Starting defense
+      defensePerFloor: 1,    // Defense increase per floor
+      experienceReward: 8,   // XP reward (multiplied by floor)
+    },
+  },
+  {
+    name: 'orc',
+    sprite: 'o',
+    stats: {
+      baseHealth: 20,
+      healthPerFloor: 10,
+      baseAttack: 3,
+      attackPerFloor: 2,
+      baseDefense: 1,
+      defensePerFloor: 1,
+      experienceReward: 10,
+    },
+  },
   // Add your own monsters here!
+];
 ];
 ```
 

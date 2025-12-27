@@ -1,6 +1,6 @@
 import { DungeonMap, TileType, Position, Entity, EntityType, Enemy, Item } from './types';
 import { SeededRandom } from '../utils/random';
-import { PICKUPS, MONSTER_TYPES, MONSTER_STATS } from '../config';
+import { PICKUPS, MONSTER_TYPES } from '../config';
 
 /**
  * Room in the dungeon
@@ -171,12 +171,12 @@ export class DungeonGenerator {
         sprite: monsterType.sprite,
         enemyType: monsterType.name,
         stats: {
-          maxHealth: MONSTER_STATS.baseHealth + floor * MONSTER_STATS.healthPerFloor,
-          health: MONSTER_STATS.baseHealth + floor * MONSTER_STATS.healthPerFloor,
-          attack: MONSTER_STATS.baseAttack + floor * MONSTER_STATS.attackPerFloor,
-          defense: MONSTER_STATS.baseDefense + floor * MONSTER_STATS.defensePerFloor,
+          maxHealth: monsterType.stats.baseHealth + floor * monsterType.stats.healthPerFloor,
+          health: monsterType.stats.baseHealth + floor * monsterType.stats.healthPerFloor,
+          attack: monsterType.stats.baseAttack + floor * monsterType.stats.attackPerFloor,
+          defense: monsterType.stats.baseDefense + floor * monsterType.stats.defensePerFloor,
           level: floor,
-          experience: MONSTER_STATS.experienceReward * floor,
+          experience: monsterType.stats.experienceReward * floor,
         },
       };
       

@@ -153,19 +153,15 @@ export const PLAYER_LEVEL_UP: PlayerLevelUpConfig = {
 export interface MonsterTypeConfig {
   name: string;
   sprite: string;
-}
-
-/**
- * Monster stats configuration
- */
-export interface MonsterStatsConfig {
-  baseHealth: number;
-  healthPerFloor: number;
-  baseAttack: number;
-  attackPerFloor: number;
-  baseDefense: number;
-  defensePerFloor: number;
-  experienceReward: number; // Base XP, multiplied by level
+  stats: {
+    baseHealth: number;
+    healthPerFloor: number;
+    baseAttack: number;
+    attackPerFloor: number;
+    baseDefense: number;
+    defensePerFloor: number;
+    experienceReward: number; // Base XP, multiplied by floor level
+  };
 }
 
 /**
@@ -173,22 +169,69 @@ export interface MonsterStatsConfig {
  * Can be extended by adding new entries to this array
  */
 export const MONSTER_TYPES: MonsterTypeConfig[] = [
-  { name: 'goblin', sprite: 'g' },
-  { name: 'orc', sprite: 'o' },
-  { name: 'troll', sprite: 'T' },
-  { name: 'skeleton', sprite: 's' },
-  { name: 'wraith', sprite: 'W' },
+  {
+    name: 'goblin',
+    sprite: 'g',
+    stats: {
+      baseHealth: 15,
+      healthPerFloor: 8,
+      baseAttack: 2,
+      attackPerFloor: 1,
+      baseDefense: 0,
+      defensePerFloor: 1,
+      experienceReward: 8,
+    },
+  },
+  {
+    name: 'orc',
+    sprite: 'o',
+    stats: {
+      baseHealth: 20,
+      healthPerFloor: 10,
+      baseAttack: 3,
+      attackPerFloor: 2,
+      baseDefense: 1,
+      defensePerFloor: 1,
+      experienceReward: 10,
+    },
+  },
+  {
+    name: 'troll',
+    sprite: 'T',
+    stats: {
+      baseHealth: 30,
+      healthPerFloor: 15,
+      baseAttack: 4,
+      attackPerFloor: 2,
+      baseDefense: 2,
+      defensePerFloor: 1,
+      experienceReward: 15,
+    },
+  },
+  {
+    name: 'skeleton',
+    sprite: 's',
+    stats: {
+      baseHealth: 18,
+      healthPerFloor: 9,
+      baseAttack: 3,
+      attackPerFloor: 2,
+      baseDefense: 0,
+      defensePerFloor: 0,
+      experienceReward: 9,
+    },
+  },
+  {
+    name: 'wraith',
+    sprite: 'W',
+    stats: {
+      baseHealth: 25,
+      healthPerFloor: 12,
+      baseAttack: 5,
+      attackPerFloor: 3,
+      baseDefense: 1,
+      defensePerFloor: 1,
+      experienceReward: 12,
+    },
+  },
 ];
-
-/**
- * Monster stats scaling configuration
- */
-export const MONSTER_STATS: MonsterStatsConfig = {
-  baseHealth: 20,
-  healthPerFloor: 10,
-  baseAttack: 3,
-  attackPerFloor: 2,
-  baseDefense: 1,
-  defensePerFloor: 1,
-  experienceReward: 10,
-};

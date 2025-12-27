@@ -43,6 +43,9 @@ export function decodeSaveCode(code: string): Partial<GameState> | null {
     const json = atob(encoded);
     const data = JSON.parse(json);
 
+    // Use defaulted level value to prevent NaN when data.l is undefined
+    const level = data.l || 1;
+
     return {
       player: {
         id: 'player',
@@ -50,12 +53,12 @@ export function decodeSaveCode(code: string): Partial<GameState> | null {
         position: { x: 0, y: 0 },
         sprite: PLAYER_START.sprite,
         stats: {
-          level: data.l || 1,
+          level: level,
           experience: data.e || 0,
-          maxHealth: PLAYER_START.maxHealth + (data.l - 1) * PLAYER_LEVEL_UP.healthIncrease,
-          health: PLAYER_START.maxHealth + (data.l - 1) * PLAYER_LEVEL_UP.healthIncrease,
-          attack: PLAYER_START.attack + (data.l - 1) * PLAYER_LEVEL_UP.attackIncrease,
-          defense: PLAYER_START.defense + (data.l - 1) * PLAYER_LEVEL_UP.defenseIncrease,
+          maxHealth: PLAYER_START.maxHealth + (level - 1) * PLAYER_LEVEL_UP.healthIncrease,
+          health: PLAYER_START.maxHealth + (level - 1) * PLAYER_LEVEL_UP.healthIncrease,
+          attack: PLAYER_START.attack + (level - 1) * PLAYER_LEVEL_UP.attackIncrease,
+          defense: PLAYER_START.defense + (level - 1) * PLAYER_LEVEL_UP.defenseIncrease,
         },
       },
       currentFloor: data.f || 1,
