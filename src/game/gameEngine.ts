@@ -12,7 +12,7 @@ import {
 } from './types';
 import { DungeonGenerator } from './dungeonGenerator';
 import { generateSeed } from '../utils/random';
-import { PICKUPS } from '../config';
+import { PICKUPS, PLAYER_START, PLAYER_LEVEL_UP } from '../config';
 
 /**
  * Game action result
@@ -60,14 +60,14 @@ export class GameEngine {
       id: 'player',
       type: EntityType.PLAYER,
       position: { x: 0, y: 0 },
-      sprite: '@',
+      sprite: PLAYER_START.sprite,
       stats: {
-        maxHealth: 100,
-        health: 100,
-        attack: 5,
-        defense: 2,
-        level: 1,
-        experience: 0,
+        maxHealth: PLAYER_START.maxHealth,
+        health: PLAYER_START.maxHealth,
+        attack: PLAYER_START.attack,
+        defense: PLAYER_START.defense,
+        level: PLAYER_START.level,
+        experience: PLAYER_START.experience,
       },
       activeEffects: [],
     };
@@ -189,7 +189,7 @@ export class GameEngine {
     if (enemy.stats.health <= 0) {
       killed = true;
       this.removeEntity(enemy.id);
-      const expGain = 10 * enemy.stats.level;
+      const expGain = enemy.stats.experience;
       this.state.player.stats.experience += expGain;
       message += ` The ${enemy.enemyType} is defeated! (+${expGain} XP)`;
       
@@ -424,16 +424,16 @@ export class GameEngine {
    * Check for level up
    */
   private checkLevelUp(): string | null {
-    const expNeeded = this.state.player.stats.level * 100;
+    const expNeeded = this.state.player.stats.level * PLAYER_LEVEL_UP.experiencePerLevel;
     if (this.state.player.stats.experience >= expNeeded) {
       this.state.player.stats.level++;
       this.state.player.stats.experience -= expNeeded;
-      this.state.player.stats.maxHealth += 20;
+      this.state.player.stats.maxHealth += PLAYER_LEVEL_UP.healthIncrease;
       // Design choice: on level up, the player is fully healed to the new maxHealth.
       // If desired, this behavior can be made configurable instead of always fully restoring health.
       this.state.player.stats.health = this.state.player.stats.maxHealth;
-      this.state.player.stats.attack += 2;
-      this.state.player.stats.defense += 1;
+      this.state.player.stats.attack += PLAYER_LEVEL_UP.attackIncrease;
+      this.state.player.stats.defense += PLAYER_LEVEL_UP.defenseIncrease;
       return `Level up! You are now level ${this.state.player.stats.level}!`;
     }
     return null;

@@ -108,3 +108,130 @@ export const PICKUPS: PickupConfig[] = [
     },
   },
 ];
+
+/**
+ * Player starting configuration
+ */
+export interface PlayerConfig {
+  sprite: string;
+  maxHealth: number;
+  attack: number;
+  defense: number;
+  level: number;
+  experience: number;
+}
+
+export const PLAYER_START: PlayerConfig = {
+  sprite: '@',
+  maxHealth: 100,
+  attack: 5,
+  defense: 2,
+  level: 1,
+  experience: 0,
+};
+
+/**
+ * Player level-up configuration
+ */
+export interface PlayerLevelUpConfig {
+  healthIncrease: number;
+  attackIncrease: number;
+  defenseIncrease: number;
+  experiencePerLevel: number; // Base XP needed, multiplied by level
+}
+
+export const PLAYER_LEVEL_UP: PlayerLevelUpConfig = {
+  healthIncrease: 20,
+  attackIncrease: 2,
+  defenseIncrease: 1,
+  experiencePerLevel: 100, // Base XP needed, multiplied by level
+};
+
+/**
+ * Monster type configuration
+ */
+export interface MonsterTypeConfig {
+  name: string;
+  sprite: string;
+  stats: {
+    baseHealth: number;
+    healthPerFloor: number;
+    baseAttack: number;
+    attackPerFloor: number;
+    baseDefense: number;
+    defensePerFloor: number;
+    experienceReward: number; // Base XP, multiplied by floor level
+  };
+}
+
+/**
+ * Available monster types
+ * Can be extended by adding new entries to this array
+ */
+export const MONSTER_TYPES: MonsterTypeConfig[] = [
+  {
+    name: 'goblin',
+    sprite: 'g',
+    stats: {
+      baseHealth: 15,
+      healthPerFloor: 8,
+      baseAttack: 2,
+      attackPerFloor: 1,
+      baseDefense: 0,
+      defensePerFloor: 1,
+      experienceReward: 8,
+    },
+  },
+  {
+    name: 'orc',
+    sprite: 'o',
+    stats: {
+      baseHealth: 20,
+      healthPerFloor: 10,
+      baseAttack: 3,
+      attackPerFloor: 2,
+      baseDefense: 1,
+      defensePerFloor: 1,
+      experienceReward: 10,
+    },
+  },
+  {
+    name: 'troll',
+    sprite: 'T',
+    stats: {
+      baseHealth: 30,
+      healthPerFloor: 15,
+      baseAttack: 4,
+      attackPerFloor: 2,
+      baseDefense: 2,
+      defensePerFloor: 1,
+      experienceReward: 15,
+    },
+  },
+  {
+    name: 'skeleton',
+    sprite: 's',
+    stats: {
+      baseHealth: 18,
+      healthPerFloor: 9,
+      baseAttack: 3,
+      attackPerFloor: 2,
+      baseDefense: 0,
+      defensePerFloor: 0,
+      experienceReward: 9,
+    },
+  },
+  {
+    name: 'wraith',
+    sprite: 'W',
+    stats: {
+      baseHealth: 25,
+      healthPerFloor: 12,
+      baseAttack: 5,
+      attackPerFloor: 3,
+      baseDefense: 1,
+      defensePerFloor: 1,
+      experienceReward: 12,
+    },
+  },
+];
