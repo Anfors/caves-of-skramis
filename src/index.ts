@@ -280,7 +280,7 @@ class Game {
     this.setupEngine();
     this.uiController.addMessage('Game loaded from save code!', 'success');
     this.uiController.addMessage(
-      `Welcome back! Level ${savedState.player?.stats.level || 1}`,
+      `Welcome back! Level ${savedState.player?.stats.level ?? 1}`,
       'info'
     );
     this.update();

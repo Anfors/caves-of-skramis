@@ -44,7 +44,7 @@ export function decodeSaveCode(code: string): Partial<GameState> | null {
     const data = JSON.parse(json);
 
     // Use defaulted level value to prevent NaN when data.l is undefined
-    const level = data.l || 1;
+    const level = data.l ?? 1;
 
     return {
       player: {
@@ -54,14 +54,14 @@ export function decodeSaveCode(code: string): Partial<GameState> | null {
         sprite: PLAYER_START.sprite,
         stats: {
           level: level,
-          experience: data.e || 0,
+          experience: data.e ?? 0,
           maxHealth: PLAYER_START.maxHealth + (level - 1) * PLAYER_LEVEL_UP.healthIncrease,
           health: PLAYER_START.maxHealth + (level - 1) * PLAYER_LEVEL_UP.healthIncrease,
           attack: PLAYER_START.attack + (level - 1) * PLAYER_LEVEL_UP.attackIncrease,
           defense: PLAYER_START.defense + (level - 1) * PLAYER_LEVEL_UP.defenseIncrease,
         },
       },
-      currentFloor: data.f || 1,
+      currentFloor: data.f ?? 1,
       seed: data.s,
       timestamp: data.t,
     };
