@@ -2,7 +2,6 @@ import { GameEngine } from './game/gameEngine';
 import { Renderer } from './ui/renderer';
 import { UIController } from './ui/uiController';
 import { encodeGameState, decodeSaveCode } from './utils/saveCode';
-import { getViewportWidth, getViewportHeight } from './config';
 
 /**
  * Main game application
@@ -173,25 +172,10 @@ class Game {
       return;
     }
 
-    // Calculate camera position
-    const viewportWidth = getViewportWidth();
-    const viewportHeight = getViewportHeight();
-    const cameraX = Math.max(
-      0,
-      Math.min(
-        dungeon.width - viewportWidth,
-        state.player.position.x - Math.floor(viewportWidth / 2)
-      )
-    );
-    const cameraY = Math.max(
-      0,
-      Math.min(
-        dungeon.height - viewportHeight,
-        state.player.position.y - Math.floor(viewportHeight / 2)
-      )
-    );
+    // Get camera position from renderer
+    const cameraPos = this.renderer.getCameraPosition(this.engine);
 
-    const worldPos = this.renderer.screenToWorld(screenX, screenY, { x: cameraX, y: cameraY });
+    const worldPos = this.renderer.screenToWorld(screenX, screenY, cameraPos);
 
     // Move towards clicked position
     const dx = Math.sign(worldPos.x - state.player.position.x);
