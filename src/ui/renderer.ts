@@ -61,6 +61,35 @@ export class Renderer {
   }
 
   /**
+   * Calculate camera position (centered on player)
+   */
+  getCameraPosition(engine: GameEngine): Position {
+    const dungeon = engine.getDungeon();
+    const state = engine.getState();
+
+    if (!dungeon) {
+      return { x: 0, y: 0 };
+    }
+
+    const cameraX = Math.max(
+      0,
+      Math.min(
+        dungeon.width - this.viewportWidth,
+        state.player.position.x - Math.floor(this.viewportWidth / 2)
+      )
+    );
+    const cameraY = Math.max(
+      0,
+      Math.min(
+        dungeon.height - this.viewportHeight,
+        state.player.position.y - Math.floor(this.viewportHeight / 2)
+      )
+    );
+
+    return { x: cameraX, y: cameraY };
+  }
+
+  /**
    * Render the game
    */
   render(engine: GameEngine): void {
@@ -76,20 +105,9 @@ export class Renderer {
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     // Calculate camera position (centered on player)
-    const cameraX = Math.max(
-      0,
-      Math.min(
-        dungeon.width - this.viewportWidth,
-        state.player.position.x - Math.floor(this.viewportWidth / 2)
-      )
-    );
-    const cameraY = Math.max(
-      0,
-      Math.min(
-        dungeon.height - this.viewportHeight,
-        state.player.position.y - Math.floor(this.viewportHeight / 2)
-      )
-    );
+    const cameraPos = this.getCameraPosition(engine);
+    const cameraX = cameraPos.x;
+    const cameraY = cameraPos.y;
 
     // Render tiles
     for (let y = 0; y < this.viewportHeight; y++) {
