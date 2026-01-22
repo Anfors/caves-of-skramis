@@ -12,7 +12,8 @@ import {
 } from './types';
 import { DungeonGenerator } from './dungeonGenerator';
 import { generateSeed } from '../utils/random';
-import { PICKUPS, PLAYER_START, PLAYER_LEVEL_UP } from '../config';
+import { PICKUPS, PLAYER_START, PLAYER_LEVEL_UP, RISKY_RETREAT } from '../config';
+import { findPath, manhattanDistance } from '../utils/pathfinding';
 
 /**
  * Game action result
@@ -136,6 +137,23 @@ export class GameEngine {
       return this.attack(enemy);
     }
 
+    // Check for risky retreat: player is adjacent to enemy and moving away
+    if (RISKY_RETREAT.enabled) {
+      const adjacentEnemies = this.getAdjacentEnemies();
+      if (adjacentEnemies.length > 0) {
+        // Check if moving away from at least one adjacent enemy
+        const isMovingAway = adjacentEnemies.some((e) => {
+          const oldDist = manhattanDistance(this.state.player.position, e.position);
+          const newDist = manhattanDistance(newPos, e.position);
+          return newDist > oldDist;
+        });
+
+        if (isMovingAway) {
+          return this.riskyRetreat(newPos, adjacentEnemies);
+        }
+      }
+    }
+
     // Check for stairs
     const stairs = this.getEntityAt(newPos, EntityType.STAIRS);
     if (stairs) {
@@ -161,6 +179,124 @@ export class GameEngine {
     this.enemyTurn();
 
     return { success: true };
+  }
+
+  /**
+   * Move player to a specific position using pathfinding
+   */
+  movePlayerToPosition(targetPos: Position): GameAction {
+    if (!this.dungeon) {
+      return { success: false, message: 'No dungeon loaded' };
+    }
+
+    // Check if target is valid
+    if (
+      targetPos.x < 0 ||
+      targetPos.x >= this.dungeon.width ||
+      targetPos.y < 0 ||
+      targetPos.y >= this.dungeon.height
+    ) {
+      return { success: false, message: 'Invalid target position' };
+    }
+
+    // Check if target is the player's current position
+    if (targetPos.x === this.state.player.position.x && targetPos.y === this.state.player.position.y) {
+      return { success: false, message: 'Already at target position' };
+    }
+
+    // Find path to target
+    const path = findPath(this.state.player.position, targetPos, this.dungeon);
+    
+    if (path.length === 0) {
+      return { success: false, message: 'Cannot reach that location' };
+    }
+
+    // Take first step in path
+    const nextPos = path[0];
+    const dx = nextPos.x - this.state.player.position.x;
+    const dy = nextPos.y - this.state.player.position.y;
+    
+    return this.movePlayer(dx, dy);
+  }
+
+  /**
+   * Get all enemies adjacent to player
+   */
+  getAdjacentEnemies(): Enemy[] {
+    if (!this.dungeon) return [];
+
+    const adjacent: Enemy[] = [];
+    const directions = [
+      { x: 1, y: 0 },
+      { x: -1, y: 0 },
+      { x: 0, y: 1 },
+      { x: 0, y: -1 },
+    ];
+
+    for (const dir of directions) {
+      const checkPos: Position = {
+        x: this.state.player.position.x + dir.x,
+        y: this.state.player.position.y + dir.y,
+      };
+      const enemy = this.getEntityAt(checkPos, EntityType.ENEMY) as Enemy;
+      if (enemy) {
+        adjacent.push(enemy);
+      }
+    }
+
+    return adjacent;
+  }
+
+  /**
+   * Attempt risky retreat from adjacent enemies
+   */
+  private riskyRetreat(targetPos: Position, adjacentEnemies: Enemy[]): GameAction {
+    // Roll for success
+    const roll = Math.random();
+    const success = roll < RISKY_RETREAT.successChance;
+
+    if (success) {
+      // Successful retreat
+      this.state.player.position = targetPos;
+      
+      // Enemy turn if retreat consumes turn
+      if (RISKY_RETREAT.consumesTurn) {
+        this.enemyTurn();
+      }
+      
+      return { 
+        success: true, 
+        message: `You successfully retreat from combat!`
+      };
+    } else {
+      // Failed retreat - take damage from all adjacent enemies
+      let totalDamage = 0;
+      const enemyNames: string[] = [];
+
+      for (const enemy of adjacentEnemies) {
+        const baseDamage = Math.max(1, enemy.stats.attack - this.state.player.stats.defense);
+        const damage = Math.floor(baseDamage * RISKY_RETREAT.damageMultiplier);
+        totalDamage += damage;
+        enemyNames.push(enemy.enemyType);
+      }
+
+      this.state.player.stats.health -= totalDamage;
+      
+      const enemyList = enemyNames.join(' and ');
+      const verb = adjacentEnemies.length === 1 ? 'strikes' : 'strike';
+      const message = `Failed to retreat! The ${enemyList} ${verb} you for ${totalDamage} damage!`;
+      
+      // Enemy turn if retreat consumes turn
+      if (RISKY_RETREAT.consumesTurn) {
+        this.enemyTurn();
+      }
+
+      return {
+        success: false,
+        message,
+        combat: { damage: 0, killed: false, enemyDamage: totalDamage },
+      };
+    }
   }
 
   /**

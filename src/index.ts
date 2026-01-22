@@ -44,6 +44,14 @@ class Game {
     // Touch controls for mobile
     this.canvas.addEventListener('touchstart', (e) => this.handleTouch(e));
     this.canvas.addEventListener('click', (e) => this.handleClick(e));
+    
+    // Mouse hover to show highlights
+    this.canvas.addEventListener('mouseenter', () => {
+      this.renderer.setShowHighlights(true);
+    });
+    this.canvas.addEventListener('mouseleave', () => {
+      this.renderer.setShowHighlights(false);
+    });
 
     // Button controls
     const newGameBtn = document.getElementById('new-game-btn');
@@ -177,21 +185,31 @@ class Game {
 
     const worldPos = this.renderer.screenToWorld(screenX, screenY, cameraPos);
 
-    // Move towards clicked position
-    const dx = Math.sign(worldPos.x - state.player.position.x);
-    const dy = Math.sign(worldPos.y - state.player.position.y);
+    // Check if clicked position is valid
+    if (
+      worldPos.x < 0 ||
+      worldPos.x >= dungeon.width ||
+      worldPos.y < 0 ||
+      worldPos.y >= dungeon.height
+    ) {
+      return;
+    }
 
-    if (dx !== 0 || dy !== 0) {
-      const result = this.engine.movePlayer(dx, dy);
-      if (result.message) {
-        const type = result.combat ? 'combat' : 'info';
-        this.uiController.addMessage(result.message, type);
-      }
-      this.update();
+    // If clicked on current position, do nothing
+    if (worldPos.x === state.player.position.x && worldPos.y === state.player.position.y) {
+      return;
+    }
 
-      if (!this.engine.isPlayerAlive()) {
-        this.gameOver();
-      }
+    // Try to move to clicked position using pathfinding
+    const result = this.engine.movePlayerToPosition(worldPos);
+    if (result.message) {
+      const type = result.combat ? 'combat' : 'info';
+      this.uiController.addMessage(result.message, type);
+    }
+    this.update();
+
+    if (!this.engine.isPlayerAlive()) {
+      this.gameOver();
     }
   }
 
@@ -222,6 +240,7 @@ class Game {
    * Render game
    */
   private render(): void {
+    this.renderer.updateHighlights(this.engine);
     this.renderer.render(this.engine);
   }
 
