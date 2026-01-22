@@ -1,6 +1,13 @@
 import { Position, TileType, DungeonMap, EntityType } from '../game/types';
 
 /**
+ * Calculate Manhattan distance between two positions
+ */
+export function manhattanDistance(a: Position, b: Position): number {
+  return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+}
+
+/**
  * Node for A* pathfinding
  */
 interface PathNode {
@@ -9,13 +16,6 @@ interface PathNode {
   h: number; // Heuristic cost to goal
   f: number; // Total cost (g + h)
   parent: PathNode | null;
-}
-
-/**
- * Calculate Manhattan distance between two positions
- */
-function manhattanDistance(a: Position, b: Position): number {
-  return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
 }
 
 /**
@@ -66,8 +66,14 @@ export function findPath(
     return !occupiedByEnemy;
   };
 
-  // Check if goal is reachable
-  if (!isWalkable(goal.x, goal.y)) {
+  // Check if goal is reachable (walls or out of bounds)
+  if (
+    goal.x < 0 ||
+    goal.x >= width ||
+    goal.y < 0 ||
+    goal.y >= height ||
+    dungeon.tiles[goal.y][goal.x] === TileType.WALL
+  ) {
     return [];
   }
 

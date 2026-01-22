@@ -13,7 +13,7 @@ import {
 import { DungeonGenerator } from './dungeonGenerator';
 import { generateSeed } from '../utils/random';
 import { PICKUPS, PLAYER_START, PLAYER_LEVEL_UP, RISKY_RETREAT } from '../config';
-import { findPath } from '../utils/pathfinding';
+import { findPath, manhattanDistance } from '../utils/pathfinding';
 
 /**
  * Game action result
@@ -143,9 +143,8 @@ export class GameEngine {
       if (adjacentEnemies.length > 0) {
         // Check if moving away from at least one adjacent enemy
         const isMovingAway = adjacentEnemies.some((e) => {
-          const oldDist = Math.abs(this.state.player.position.x - e.position.x) +
-                          Math.abs(this.state.player.position.y - e.position.y);
-          const newDist = Math.abs(newPos.x - e.position.x) + Math.abs(newPos.y - e.position.y);
+          const oldDist = manhattanDistance(this.state.player.position, e.position);
+          const newDist = manhattanDistance(newPos, e.position);
           return newDist > oldDist;
         });
 
@@ -284,7 +283,8 @@ export class GameEngine {
       this.state.player.stats.health -= totalDamage;
       
       const enemyList = enemyNames.join(' and ');
-      const message = `Failed to retreat! The ${enemyList} strike${adjacentEnemies.length === 1 ? 's' : ''} you for ${totalDamage} damage!`;
+      const verb = adjacentEnemies.length === 1 ? 'strikes' : 'strike';
+      const message = `Failed to retreat! The ${enemyList} ${verb} you for ${totalDamage} damage!`;
       
       // Enemy turn if retreat consumes turn
       if (RISKY_RETREAT.consumesTurn) {

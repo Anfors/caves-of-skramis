@@ -1,7 +1,7 @@
 import { TileType, EntityType, Position } from '../game/types';
 import { GameEngine } from '../game/gameEngine';
 import { getViewportWidth, getViewportHeight, getTileSize } from '../config';
-import { findReachableTiles } from '../utils/pathfinding';
+import { findReachableTiles, manhattanDistance } from '../utils/pathfinding';
 
 /**
  * Highlight mode for tiles
@@ -11,6 +11,14 @@ export enum HighlightMode {
   WALKABLE = 'walkable',
   RISKY = 'risky',
 }
+
+/**
+ * Highlight colors for tiles
+ */
+const HIGHLIGHT_COLORS = {
+  WALKABLE: 'rgba(81, 207, 102, 0.3)', // Green
+  RISKY: 'rgba(255, 107, 107, 0.3)',    // Red
+};
 
 /**
  * Renderer for the game
@@ -183,10 +191,10 @@ export class Renderer {
 
     // Draw highlight overlay
     if (highlight === HighlightMode.WALKABLE) {
-      this.ctx.fillStyle = 'rgba(81, 207, 102, 0.3)'; // Green highlight
+      this.ctx.fillStyle = HIGHLIGHT_COLORS.WALKABLE;
       this.ctx.fillRect(pixelX, pixelY, this.tileSize, this.tileSize);
     } else if (highlight === HighlightMode.RISKY) {
-      this.ctx.fillStyle = 'rgba(255, 107, 107, 0.3)'; // Red highlight for risky retreat
+      this.ctx.fillStyle = HIGHLIGHT_COLORS.RISKY;
       this.ctx.fillRect(pixelX, pixelY, this.tileSize, this.tileSize);
     }
   }
@@ -275,9 +283,8 @@ export class Renderer {
       if (adjacentEnemies.length > 0) {
         // Check if moving to this tile increases distance from any adjacent enemy
         for (const enemy of adjacentEnemies) {
-          const currentDist = Math.abs(state.player.position.x - enemy.position.x) +
-                              Math.abs(state.player.position.y - enemy.position.y);
-          const newDist = Math.abs(x - enemy.position.x) + Math.abs(y - enemy.position.y);
+          const currentDist = manhattanDistance(state.player.position, enemy.position);
+          const newDist = manhattanDistance({ x, y }, enemy.position);
           if (newDist > currentDist) {
             isRisky = true;
             break;
