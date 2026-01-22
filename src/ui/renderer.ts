@@ -1,6 +1,16 @@
 import { TileType, EntityType, Position } from '../game/types';
 import { GameEngine } from '../game/gameEngine';
 import { getViewportWidth, getViewportHeight, getTileSize } from '../config';
+import { findReachableTiles } from '../utils/pathfinding';
+
+/**
+ * Highlight mode for tiles
+ */
+export enum HighlightMode {
+  NONE = 'none',
+  WALKABLE = 'walkable',
+  RISKY = 'risky',
+}
 
 /**
  * Renderer for the game
@@ -13,6 +23,8 @@ export class Renderer {
   private viewportWidth: number = getViewportWidth();
   private viewportHeight: number = getViewportHeight();
   private zoomLevel = 1.0; // Default zoom level
+  private highlightedTiles = new Map<string, HighlightMode>();
+  private showHighlights = false;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -116,7 +128,9 @@ export class Renderer {
         const worldY = y + cameraY;
 
         if (worldX >= 0 && worldX < dungeon.width && worldY >= 0 && worldY < dungeon.height) {
-          this.renderTile(x, y, dungeon.tiles[worldY][worldX]);
+          const tileKey = `${worldX},${worldY}`;
+          const highlight = this.highlightedTiles.get(tileKey);
+          this.renderTile(x, y, dungeon.tiles[worldY][worldX], highlight);
         }
       }
     }
@@ -145,7 +159,7 @@ export class Renderer {
   /**
    * Render a tile
    */
-  private renderTile(x: number, y: number, tileType: TileType): void {
+  private renderTile(x: number, y: number, tileType: TileType, highlight?: HighlightMode): void {
     const pixelX = x * this.tileSize;
     const pixelY = y * this.tileSize;
 
@@ -165,6 +179,15 @@ export class Renderer {
         this.ctx.fillStyle = '#0a0a0a';
         this.ctx.fillRect(pixelX, pixelY, this.tileSize, this.tileSize);
         break;
+    }
+
+    // Draw highlight overlay
+    if (highlight === HighlightMode.WALKABLE) {
+      this.ctx.fillStyle = 'rgba(81, 207, 102, 0.3)'; // Green highlight
+      this.ctx.fillRect(pixelX, pixelY, this.tileSize, this.tileSize);
+    } else if (highlight === HighlightMode.RISKY) {
+      this.ctx.fillStyle = 'rgba(255, 107, 107, 0.3)'; // Red highlight for risky retreat
+      this.ctx.fillRect(pixelX, pixelY, this.tileSize, this.tileSize);
     }
   }
 
@@ -218,5 +241,65 @@ export class Renderer {
       x: tileX + cameraPos.x,
       y: tileY + cameraPos.y,
     };
+  }
+
+  /**
+   * Update highlighted tiles based on current game state
+   */
+  updateHighlights(engine: GameEngine): void {
+    this.highlightedTiles.clear();
+    
+    if (!this.showHighlights) {
+      return;
+    }
+
+    const dungeon = engine.getDungeon();
+    const state = engine.getState();
+    
+    if (!dungeon || !engine.isPlayerAlive()) {
+      return;
+    }
+
+    // Get adjacent enemies to determine risky tiles
+    const adjacentEnemies = engine.getAdjacentEnemies();
+
+    // Find all reachable tiles
+    const reachableTiles = findReachableTiles(state.player.position, dungeon);
+
+    // Mark reachable tiles and identify risky retreat tiles
+    for (const tileKey of reachableTiles) {
+      const [x, y] = tileKey.split(',').map(Number);
+      
+      // Check if this tile would trigger a risky retreat
+      let isRisky = false;
+      if (adjacentEnemies.length > 0) {
+        // Check if moving to this tile increases distance from any adjacent enemy
+        for (const enemy of adjacentEnemies) {
+          const currentDist = Math.abs(state.player.position.x - enemy.position.x) +
+                              Math.abs(state.player.position.y - enemy.position.y);
+          const newDist = Math.abs(x - enemy.position.x) + Math.abs(y - enemy.position.y);
+          if (newDist > currentDist) {
+            isRisky = true;
+            break;
+          }
+        }
+      }
+
+      this.highlightedTiles.set(tileKey, isRisky ? HighlightMode.RISKY : HighlightMode.WALKABLE);
+    }
+  }
+
+  /**
+   * Enable or disable highlight display
+   */
+  setShowHighlights(show: boolean): void {
+    this.showHighlights = show;
+  }
+
+  /**
+   * Check if highlights are shown
+   */
+  getShowHighlights(): boolean {
+    return this.showHighlights;
   }
 }

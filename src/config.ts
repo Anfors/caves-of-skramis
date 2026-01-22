@@ -110,6 +110,24 @@ export const PICKUPS: PickupConfig[] = [
 ];
 
 /**
+ * Risky retreat configuration
+ * When player is adjacent to an enemy and tries to move away
+ */
+export interface RiskyRetreatConfig {
+  enabled: boolean;
+  successChance: number; // 0.0 to 1.0 (0.5 = 50% chance)
+  damageMultiplier: number; // Multiplier for enemy damage on failure (2 = 2x damage)
+  consumesTurn: boolean; // Whether the retreat attempt consumes the player's turn
+}
+
+export const RISKY_RETREAT: RiskyRetreatConfig = {
+  enabled: true,
+  successChance: 0.5, // 50% chance to successfully retreat
+  damageMultiplier: 2, // Take 2x damage on failure
+  consumesTurn: true, // Retreat attempt uses the player's turn
+};
+
+/**
  * Player starting configuration
  */
 export interface PlayerConfig {
